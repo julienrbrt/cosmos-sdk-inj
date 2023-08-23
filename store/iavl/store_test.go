@@ -36,17 +36,20 @@ func randBytes(numBytes int) []byte {
 
 // make a tree with data from above and save it
 func newAlohaTree(t *testing.T, db dbm.DB) (*iavl.MutableTree, types.CommitID) {
+	t.Helper()
 	dbt := wrapper.NewCosmosDB(dbm.NewMemDB())
-	tree := iavl.NewMutableTree(dbt, cacheSize, false, log.NewTestLogger(t))
+	tree := iavl.NewMutableTree(dbt, cacheSize, false, log.NewNopLogger())
 
 	for k, v := range treeData {
-		tree.Set([]byte(k), []byte(v))
+		_, err := tree.Set([]byte(k), []byte(v))
+		require.NoError(t, err)
 	}
 
 	for i := 0; i < nMoreData; i++ {
 		key := randBytes(12)
 		value := randBytes(50)
-		tree.Set(key, value)
+		_, err := tree.Set(key, value)
+		require.NoError(t, err)
 	}
 
 	hash, ver, err := tree.SaveVersion()
@@ -283,7 +286,7 @@ func TestIAVLIterator(t *testing.T) {
 
 func TestIAVLReverseIterator(t *testing.T) {
 	db := wrapper.NewCosmosDB(dbm.NewMemDB())
-	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewTestLogger(t))
+	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewNopLogger())
 
 	iavlStore := UnsafeNewStore(tree)
 
@@ -315,7 +318,7 @@ func TestIAVLReverseIterator(t *testing.T) {
 
 func TestIAVLPrefixIterator(t *testing.T) {
 	db := wrapper.NewCosmosDB(dbm.NewMemDB())
-	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewTestLogger(t))
+	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewNopLogger())
 
 	iavlStore := UnsafeNewStore(tree)
 
@@ -378,7 +381,7 @@ func TestIAVLPrefixIterator(t *testing.T) {
 
 func TestIAVLReversePrefixIterator(t *testing.T) {
 	db := wrapper.NewCosmosDB(dbm.NewMemDB())
-	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewTestLogger(t))
+	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewNopLogger())
 
 	iavlStore := UnsafeNewStore(tree)
 
@@ -445,7 +448,7 @@ func nextVersion(iavl *Store) {
 
 func TestIAVLNoPrune(t *testing.T) {
 	db := wrapper.NewCosmosDB(dbm.NewMemDB())
-	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewTestLogger(t))
+	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewNopLogger())
 
 	iavlStore := UnsafeNewStore(tree)
 	nextVersion(iavlStore)
@@ -463,7 +466,7 @@ func TestIAVLNoPrune(t *testing.T) {
 
 func TestIAVLStoreQuery(t *testing.T) {
 	db := wrapper.NewCosmosDB(dbm.NewMemDB())
-	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewTestLogger(t))
+	tree := iavl.NewMutableTree(db, cacheSize, false, log.NewNopLogger())
 
 	iavlStore := UnsafeNewStore(tree)
 

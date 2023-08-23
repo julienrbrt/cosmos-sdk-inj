@@ -27,6 +27,7 @@ type (
 		DeleteVersionsTo(version int64) error
 		Version() int64
 		Hash() []byte
+		WorkingHash() []byte
 		VersionExists(version int64) bool
 		GetVersioned(key []byte, version int64) ([]byte, error)
 		GetImmutable(version int64) (*iavl.ImmutableTree, error)
@@ -104,4 +105,8 @@ func (it *immutableTree) Iterator(start, end []byte, ascending bool) (types.Iter
 func (mt *mutableTree) Iterator(start, end []byte, ascending bool) (types.Iterator, error) {
 	iterator, err := mt.MutableTree.Iterator(start, end, ascending)
 	return iterator.(dbm.Iterator), err
+}
+
+func (it *immutableTree) WorkingHash() []byte {
+	panic("cannot call 'WorkingHash' on an immutable IAVL tree")
 }
