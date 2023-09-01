@@ -6,93 +6,35 @@ import (
 )
 
 type DBWrapper struct {
-	db cmtdb.DB
+	cmtdb.DB
 }
 
 func NewCosmosDB(db cmtdb.DB) cdbm.DB {
-	return &DBWrapper{db: db}
-}
-
-func (db *DBWrapper) Get(key []byte) ([]byte, error) {
-	return db.db.Get(key)
-}
-
-func (db *DBWrapper) Has(key []byte) (bool, error) {
-	return db.db.Has(key)
-}
-
-func (db *DBWrapper) Set(key []byte, value []byte) error {
-	return db.db.Set(key, value)
-}
-
-func (db *DBWrapper) SetSync(key []byte, value []byte) error {
-	return db.db.SetSync(key, value)
-}
-
-func (db *DBWrapper) Delete(key []byte) error {
-	return db.db.Delete(key)
-}
-
-func (db *DBWrapper) DeleteSync(key []byte) error {
-	return db.db.DeleteSync(key)
+	return &DBWrapper{db}
 }
 
 func (db *DBWrapper) Iterator(start, end []byte) (cdbm.Iterator, error) {
-	it, err := db.db.Iterator(start, end)
-	return it.(cdbm.Iterator), err
+	return db.DB.Iterator(start, end)
 }
 
 func (db *DBWrapper) ReverseIterator(start, end []byte) (cdbm.Iterator, error) {
-	it, err := db.db.ReverseIterator(start, end)
-	return it.(cdbm.Iterator), err
+	return db.DB.ReverseIterator(start, end)
 }
 
 func (db *DBWrapper) NewBatch() cdbm.Batch {
-	return NewCosmosBatch(db.db.NewBatch())
+	return NewCosmosBatch(db.DB.NewBatch())
 }
 
 func (db *DBWrapper) NewBatchWithSize(size int) cdbm.Batch {
-	return NewCosmosBatch(db.db.NewBatch())
-}
-
-func (db *DBWrapper) Print() error {
-	return db.db.Print()
-}
-
-func (db *DBWrapper) Stats() map[string]string {
-	return db.db.Stats()
-}
-
-func (db *DBWrapper) Close() error {
-	return db.db.Close()
+	return NewCosmosBatch(db.DB.NewBatch())
 }
 
 type BatchWrapper struct {
-	batch cmtdb.Batch
+	cmtdb.Batch
 }
 
 func NewCosmosBatch(batch cmtdb.Batch) cdbm.Batch {
-	return &BatchWrapper{batch: batch}
-}
-
-func (b *BatchWrapper) Set(key, value []byte) error {
-	return b.batch.Set(key, value)
-}
-
-func (b *BatchWrapper) Delete(key []byte) error {
-	return b.batch.Delete(key)
-}
-
-func (b *BatchWrapper) Write() error {
-	return b.batch.Write()
-}
-
-func (b *BatchWrapper) WriteSync() error {
-	return b.batch.WriteSync()
-}
-
-func (b *BatchWrapper) Close() error {
-	return b.batch.Close()
+	return &BatchWrapper{batch}
 }
 
 func (b *BatchWrapper) GetByteSize() (int, error) {

@@ -3,7 +3,6 @@ package iavl
 import (
 	"fmt"
 
-	dbm "github.com/cometbft/cometbft-db"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/iavl"
 )
@@ -48,6 +47,10 @@ type (
 		*iavl.MutableTree
 	}
 )
+
+func (mt *mutableTree) Iterator(start, end []byte, ascending bool) (types.Iterator, error) {
+	return mt.MutableTree.Iterator(start, end, ascending)
+}
 
 func (it *immutableTree) Set(_, _ []byte) (bool, error) {
 	panic("cannot call 'Set' on an immutable IAVL tree")
@@ -98,13 +101,7 @@ func (it *immutableTree) LoadVersionForOverwriting(targetVersion int64) error {
 }
 
 func (it *immutableTree) Iterator(start, end []byte, ascending bool) (types.Iterator, error) {
-	iterator, err := it.ImmutableTree.Iterator(start, end, ascending)
-	return iterator.(dbm.Iterator), err
-}
-
-func (mt *mutableTree) Iterator(start, end []byte, ascending bool) (types.Iterator, error) {
-	iterator, err := mt.MutableTree.Iterator(start, end, ascending)
-	return iterator.(dbm.Iterator), err
+	return it.ImmutableTree.Iterator(start, end, ascending)
 }
 
 func (it *immutableTree) WorkingHash() []byte {
